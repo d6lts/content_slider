@@ -183,7 +183,7 @@ function content_slider_block($op = 'list', $delta = 0) {
 		{
 			$slider_nid = $data->nid;
 			$output_body .= '<div class="contentdiv">'."\n";
-			$output_body .= "<a href='$base_url/node/$slider_nid'>".$data->teaser ."</a>";
+			$output_body .= "<a href='$base_url/node/$slider_nid'>".node_view(node_load($node->nid), 1)."</a>";
 			if($slider_nid==1)
 			{
 				$output_body  .='<p></p><a href="javascript:featuredcontentslider.jumpTo(\'slider1\', 3)">';  
