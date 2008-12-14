@@ -1,11 +1,13 @@
+This is a module developed by Ebizon Technologies (www.ebizontek.com). Email: info@ebizontek.com.
+
 Featured Content Slider:
 -------------------------
-A module to feature latest 5 created node (selected through admin settings) in a block that displays as a slideshow
+A module to feature latest created nodes (selected through admin settings) in a block that displays as a slideshow.
 
 Description:
 ------------
 
-Featured Content Slider makes a slideshow out of node content on the block. Currently, latest 5 selected nodes are shown. 
+Featured Content Slider makes a slideshow out of node content on the block. Currently, latest selected nodes are shown. 
 
 How to use?
 -----------
