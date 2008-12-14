@@ -1,6 +1,7 @@
 <?php
 // $Id$
 
+
 /**
  * @file
  *  Display content in 'featured content' block using jQuery.
@@ -10,104 +11,111 @@
  * Implementation of hook_help().
  */
 function content_slider_help($section) {
-	switch ($section) {
-		case 'admin/help#content_slider':
-			$output = "The content_slider module: Display content and image in Slide show mode using jQuery.";
-			return $output;
-		case 'admin/modules#description':
-			return 'The content_slider module: Display content and image in Slide show mode using jQuery.';
-	}
+  switch ($section) {
+    case 'admin/help#content_slider':
+      $output = "The content_slider module: Display content and image in Slide show mode using jQuery.";
+      return $output;
+
+    case 'admin/modules#description':
+      return 'The content_slider module: Display content and image in Slide show mode using jQuery.';
+  }
 }
 
 /**
  * Implementation of hook_perm
  */
 function content_slider_perm() {
-	return array('access content_slider', 'administer content_slider');
+  return array('access content_slider', 'administer content_slider');
 }
 
 function content_slider_menu($may_cache) {
+  $items = array();
+  if ($may_cache) {
+    $items[] = array(
+      'path' => 'admin/settings/content_slider',
+      'title' => 'Content Slider',
+      'description' => t('Setting Content Slider.'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('content_slider_admin_settings'),
+      'access' => user_access('administer content_slider'),
+      'type' => MENU_NORMAL_ITEM,
+    );
 
-	$items = array();
-
-	if ($may_cache){ 
-		$items[] = array(
-				'path' => 'admin/settings/content_slider',
-				'title' => 'Content Slider',
-				'description' => t('Setting Content Slider.'),
-				'callback' => 'drupal_get_form',
-				'callback arguments' => array('content_slider_admin_settings'),
-				'access' => user_access('administer content_slider'),
-				'type' => MENU_NORMAL_ITEM);
-
-		$items[] = array(
-				'path' => 'content_slider/list/'.arg(2),
-				'title' => t('Content Slider'),
-				'callback' => 'content_slider_page_list',
-				'callback arguments' => array(arg(2)),
-				'access' => user_access('access content_slider'),
-				'type' => MENU_CALLBACK);
-
-	}
-	return $items;
+    $items[] = array(
+      'path' => 'content_slider/list/'. arg(2),
+      'title' => t('Content Slider'),
+      'callback' => 'content_slider_page_list',
+      'callback arguments' => array(arg(2)),
+      'access' => user_access('access content_slider'),
+      'type' => MENU_CALLBACK,
+    );
+  }
+  return $items;
 }
 
 function content_slider_admin_settings() {
 
-	// only administrators can access this function
+  // only administrators can access this function
+  // Generate the form - settings applying to all patterns first
+  $form['content_slider_settings'] = array(
+    '#type' => 'fieldset',
+    '#weight' => -20,
+    '#title' => t('Basic settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
 
-	// Generate the form - settings applying to all patterns first
-	$form['content_slider_settings'] = array(
-			'#type' => 'fieldset',
-			'#weight' => -20,
-			'#title' => t('Basic settings'),
-			'#collapsible' => TRUE,
-			'#collapsed' => FALSE
-			);
-	$form['content_slider_settings']['content_slider_auto'] = array(
-			'#type' => 'checkbox',
-			'#title' => t('Auto rotate contents'),
-			'#default_value' => variable_get('content_slider_auto', 1),
-			'#description' => t("Display content without mouse click."),           
-			'#maxlength' => '1', '#size' => '1');
+  $form['content_slider_settings']['content_slider_auto'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Auto rotate contents'),
+    '#default_value' => variable_get('content_slider_auto', 1),
+    '#description' => t("Display content without mouse click."),
+    '#maxlength' => '1', '#size' => '1',
+  );
 
-	$form['content_slider_settings']['content_slider_speed'] = array(
-			'#type' => 'textfield',
-			'#title' => t('Glide animation duration (in milliseconds)'),
-			'#default_value' => variable_get('content_slider_speed', 1000),
-			);
-	$form['content_slider_settings']['content_slider_direction'] = array(
-			'#type' => 'textfield',
-			'#title' => t('Set direction of glide'),
-			'#default_value' => variable_get('content_slider_direction', 'leftright'),
-			'#description' => 'Available value: "updown", "downup", "leftright", or "rightleft"'
-			);
+  $form['content_slider_settings']['content_slider_speed'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Glide animation duration (in milliseconds)'),
+    '#default_value' => variable_get('content_slider_speed', 1000),
+  );
 
-	//$output_body .=  'direction: "downup", //set direction of glide: "updown", "downup", "leftright", or "rightleft"'
+  $form['content_slider_settings']['content_slider_direction'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Set direction of glide'),
+    '#default_value' => variable_get('content_slider_direction', 'leftright'),
+    '#description' => 'Available value: "updown", "downup", "leftright", or "rightleft"',
+  );
 
-	$form['content_slider_source'] = array(
-			'#type' => 'fieldset',
-			'#weight' => -20,
-			'#title' => t('Slider content source (based on Drupal content-type)'),
-			'#collapsible' => TRUE,
-			'#collapsed' => FALSE
-			);
-	$form['content_slider_source']['content_slider_source_1'] = array(
-			'#type' => 'textfield',
-			'#title' => t('Content type for Slider 1'),
-			'#default_value' => variable_get('content_slider_source_1', 'page'),
-			);
-	$form['content_slider_source']['content_slider_source_2'] = array(
-			'#type' => 'textfield',
-			'#title' => t('Content type for Slider 2'),
-			'#default_value' => variable_get('content_slider_source_2', 'story'),
-			);	  
-	$form['content_slider_source']['content_slider_source_3'] = array(
-			'#type' => 'textfield',
-			'#title' => t('Content type for Slider 3'),
-			'#default_value' => variable_get('content_slider_source_3', ''),
-			);	  	  
-	return system_settings_form($form);
+  // set direction of glide: "updown", "downup", "leftright", or "rightleft"'
+  //$output_body .=  'direction: "downup",
+
+  $form['content_slider_source'] = array(
+    '#type' => 'fieldset',
+    '#weight' => -20,
+    '#title' => t('Slider content source (based on Drupal content-type)'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['content_slider_source']['content_slider_source_1'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Content type for Slider 1'),
+    '#default_value' => variable_get('content_slider_source_1', 'page'),
+  );
+
+  $form['content_slider_source']['content_slider_source_2'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Content type for Slider 2'),
+    '#default_value' => variable_get('content_slider_source_2', 'story'),
+  );
+
+  $form['content_slider_source']['content_slider_source_3'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Content type for Slider 3'),
+    '#default_value' => variable_get('content_slider_source_3', ''),
+  );
+
+  return system_settings_form($form);
 }
 
 /**
@@ -115,140 +123,126 @@ function content_slider_admin_settings() {
  *
  */
 function content_slider_block($op = 'list', $delta = 0) {
-	$content_slider_auto  = variable_get("content_slider_auto", 1);  
-	$content_slider_speed = variable_get("content_slider_speed", 1000);  
-	$content_slider_direction = variable_get("content_slider_direction", 'leftright');  
+  $content_slider_auto = variable_get("content_slider_auto", 1);
+  $content_slider_speed = variable_get("content_slider_speed", 1000);
+  $content_slider_direction = variable_get("content_slider_direction", 'leftright');
 
-	$content_slider_source_1  = variable_get("content_slider_source_1", "page");
-	$content_slider_source_2  = variable_get("content_slider_source_2", "");
-	$content_slider_source_3  = variable_get("content_slider_source_3", "");
+  $content_slider_source_1 = variable_get("content_slider_source_1", "page");
+  $content_slider_source_2 = variable_get("content_slider_source_2", "");
+  $content_slider_source_3 = variable_get("content_slider_source_3", "");
 
-	global $base_url;    
-	$ajax_base_path = $base_url;
+  global $base_url;
+  $ajax_base_path = $base_url;
 
-	if ($op == 'list') 
-	{
-		$blocks[0]['info'] = 'Content Slider 1';
-		$blocks[1]['info'] = 'Content Slider 2';
-		$blocks[2]['info'] = 'Content Slider 3';
-		return $blocks;
-	}
+  if ($op == 'list') {
+    $blocks[0]['info'] = 'Content Slider 1';
+    $blocks[1]['info'] = 'Content Slider 2';
+    $blocks[2]['info'] = 'Content Slider 3';
+    return $blocks;
+  }
 
-	if ($op == 'view') {
+  if ($op == 'view') {
 
-		global $base_url;
+    global $base_url;
 
-		$c_css = $base_url.'/'.drupal_get_path('module', 'content_slider') . '/contentslider.css';
-		$c_js = $base_url.'/'.drupal_get_path('module', 'content_slider'). '/contentslider.js';
-		$js = drupal_add_js('misc/jquery.js', 'core', 'header');
-		print drupal_get_js('header', $js);        
+    drupal_add_css(drupal_get_path('module', 'content_slider') . '/contentslider.css');
+    drupal_add_js(drupal_get_path('module', 'content_slider'). '/contentslider.js');       
 
+    $output_body = "";
+    //Text
+    $output_head = ''."\n";
+    $output_head .= '/***********************************************'."\n";
+    $output_head .= '* Featured Content Slider script- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)'."\n";
+    $output_head .= '* Visit http://www.dynamicDrive.com for hundreds of DHTML scripts'."\n";
+    $output_head .= '* This notice must stay intact for legal use'."\n";
+    $output_head .= '***********************************************/'."\n";
+    //drupal_add_js($output_head,'inline');
 
-		$output_body =  '<link rel="stylesheet" type="text/css" href="'.$c_css.'" />';
+    $slider_id = $delta + 1;
+    switch ($delta) {
+      case 0:
+        $content_type = $content_slider_source_1;
+        break;
 
-		$output_body .=  '<script type="text/javascript" src="'. $jquery_js.'">';
-		$output_body .=  '</script>';
+      case 1:
+        $content_type = $content_slider_source_2;
+        break;
 
+      case 2:
+        $content_type = $content_slider_source_3;
+        break;
+    }
 
-		$output_body .=  '<script type="text/javascript" src="'. $c_js.'">';
-		$output_body .=  '</script>';
+    $output_body = '';
+    $sql  = " SELECT n.nid, teaser FROM {node} n INNER JOIN {node_revisions} r ON n.nid=r.nid "." WHERE n.status=1 AND n.type='$content_type' LIMIT 5";
+    $results     = db_query($sql);
 
+    $output_body .= '<div id="slider1" class="sliderwrapper">'."\n";
+    while ($data = db_fetch_object($results)) {
+      $slider_nid = $data->nid;
+      $output_body .= '<div class="contentdiv">'."\n";
+      $output_body .= "<a href='$base_url/node/$slider_nid'>". node_view(node_load($data->nid), 1) ."</a>";
+      if ($slider_nid == 1) {
+        $output_body .= '<p></p><a href="javascript:featuredcontentslider.jumpTo(\'slider1\', 3)">';
+      }
+      $output_body .= '</div>';
+    }
+    $output_body .= '</div>';
+    $output_body .= '<div id="paginate-slider1" class="pagination">'."\n";
+    $output_body .= '</div>';
 
+    $output_body .= '<script type="text/javascript">';
 
-		drupal_set_html_head($output_body);
-		$output_body = "";
-		//Text	
-		$output_head  =''."\n";	
-		$output_head .= '/***********************************************'."\n";
-				   $output_head .= '* Featured Content Slider script- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)'."\n";
-				   $output_head .= '* Visit http://www.dynamicDrive.com for hundreds of DHTML scripts'."\n";
-				   $output_head .= '* This notice must stay intact for legal use'."\n";
-				   $output_head .= '***********************************************/'."\n";
-		//drupal_add_js($output_head,'inline');	
+    $output_body .= 'featuredcontentslider.init({'."\n";
+    $output_body .= 'id: "slider1",//id of main slider DIV'."\n";
+    $output_body .= 'contentsource: ["inline", ""],  //Valid values: ["inline", ""] or ["ajax", "path_to_file"]'."\n";
+    $output_body .= 'toc: "#increment",  //Valid values: "#increment", "markup", ["label1", "label2", etc]'."\n";
+    $output_body .= 'nextprev: ["Previous", "Next"],  //labels for "prev" and "next" links. Set to "" to hide.'."\n";
+    $output_body .= 'revealtype: "click", //Behavior of pagination links to reveal the slides: "click" or "mouseover"'."\n";
+    $output_body .= 'enablefade: [true, 0.2],  //[true/false, fadedegree]'."\n";
+    $output_body .= 'autorotate: [true, 3000],  //[true/false, pausetime]'."\n";
+    $output_body .= 'onChange: function(previndex, curindex){  //event handler fired whenever script changes slide'."\n";
+    $output_body .= '//previndex holds index of last slide viewed b4 current (1=1st slide, 2nd=2nd etc)'."\n";
+    $output_body .= '//curindex holds index of currently shown slide (1=1st slide, 2nd=2nd etc)'."\n";
+    $output_body .= '}';
+    $output_body .= '})';
 
-		$slider_id = $delta+1;
-		switch($delta) {
-			case 0: $content_type = $content_slider_source_1; break;
-			case 1: $content_type = $content_slider_source_2; break;
-			case 2: $content_type = $content_slider_source_3; break;
-		}
-
-		$output_body  =  '';
-		$sql = " SELECT n.nid, teaser FROM {node} n INNER JOIN {node_revisions} r ON n.nid=r.nid "
-			." WHERE n.status=1 AND n.type='$content_type' LIMIT 5";
-		$results = db_query($sql);
-
-		$output_body .= '<div id="slider1" class="sliderwrapper">'."\n";
-		while ($data = db_fetch_object($results)) 
-		{
-			$slider_nid = $data->nid;
-			$output_body .= '<div class="contentdiv">'."\n";
-			$output_body .= "<a href='$base_url/node/$slider_nid'>".node_view(node_load($node->nid), 1)."</a>";
-			if($slider_nid==1)
-			{
-				$output_body  .='<p></p><a href="javascript:featuredcontentslider.jumpTo(\'slider1\', 3)">';  
-			}
-			$output_body .= '</div>';
-		}
-		$output_body .= '</div>';
-		$output_body .=  '<div id="paginate-slider1" class="pagination">'."\n";
-		$output_body .=  '</div>';
-
-		$output_body  .='<script type="text/javascript">';
-
-		$output_body  .='featuredcontentslider.init({'."\n";
-				$output_body  .='id: "slider1",//id of main slider DIV'."\n";
-				$output_body  .='contentsource: ["inline", ""],  //Valid values: ["inline", ""] or ["ajax", "path_to_file"]'."\n";
-				$output_body  .='toc: "#increment",  //Valid values: "#increment", "markup", ["label1", "label2", etc]'."\n";
-				$output_body  .='nextprev: ["Previous", "Next"],  //labels for "prev" and "next" links. Set to "" to hide.'."\n";
-				$output_body  .='revealtype: "click", //Behavior of pagination links to reveal the slides: "click" or "mouseover"'."\n";
-				$output_body  .='enablefade: [true, 0.2],  //[true/false, fadedegree]'."\n";
-				$output_body  .='autorotate: [true, 3000],  //[true/false, pausetime]'."\n";
-				$output_body  .='onChange: function(previndex, curindex){  //event handler fired whenever script changes slide'."\n";
-				$output_body  .='//previndex holds index of last slide viewed b4 current (1=1st slide, 2nd=2nd etc)'."\n";
-				$output_body  .='//curindex holds index of currently shown slide (1=1st slide, 2nd=2nd etc)'."\n";
-				$output_body  .='}';
-				$output_body  .='})';
-
-		$output_body  .='</script>';
+    $output_body .= '</script>';
 
 
-		$output_body  .='</div>';
+    $output_body .= '</div>';
 
 
-		$block['subject'] = 'Content Slider 1';        
-		$block['content'] = $output_body;  
+    $block['subject'] = 'Content Slider 1';
+    $block['content'] = $output_body;
 
 
-		return $block;
-		}
-	}
+    return $block;
+  }
+}
 
-function content_slider_page_list($i) {    
-		$content_slider_item   = variable_get("content_slider_item", 10);
+function content_slider_page_list($i) {
+  $content_slider_item = variable_get("content_slider_item", 10);
 
-		$dse_news_total = db_query(" SELECT count(*) AS total FROM {node} n WHERE n.type='slider$i' AND n.status=1");
-		$row_news       = db_fetch_object($dse_news_total);
-		$news_total     = $row_news->total;
-		$sql_counts     = "SELECT $news_total";
+  $dse_news_total = db_query(" SELECT count(*) AS total FROM {node} n WHERE n.type='slider$i' AND n.status=1");
+  $row_news       = db_fetch_object($dse_news_total);
+  $news_total     = $row_news->total;
+  $sql_counts     = "SELECT $news_total";
 
-		$sql = " SELECT n.nid, n.title, r.teaser FROM {node} n "
-			." INNER JOIN {node_revisions} r ON r.nid = n.nid "
-			." WHERE n.type = 'slider$i' AND n.status=1 "
-			." ORDER BY n.created DESC";
-		$sql = db_rewrite_sql($sql);
+  $sql = " SELECT n.nid, n.title, r.teaser FROM {node} n INNER JOIN {node_revisions} r ON r.nid = n.nid WHERE n.type = 'slider$i' AND n.status=1 ORDER BY n.created DESC";
+  $sql = db_rewrite_sql($sql);
 
-		$results = pager_query($sql, $content_slider_item, 0, $sql_counts);
+  $results = pager_query($sql, $content_slider_item, 0, $sql_counts);
 
-		$output = "<div id='content_slider$i'>";
+  $output = "<div id='content_slider$i'>";
 
-		while ($node = db_fetch_object($results)) {
-			$output .= node_view(node_load($node->nid), 1);
-		}
+  while ($node = db_fetch_object($results)) {
+    $output .= node_view(node_load($node->nid), 1);
+  }
 
-		$output .= theme('pager', NULL, $content_slider_item, 0);
-		$output .= '</div>';
+  $output .= theme('pager', NULL, $content_slider_item, 0);
+  $output .= '</div>';
 
-		return $output;
-	}
+  return $output;
+}
 
