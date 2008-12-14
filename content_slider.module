@@ -28,28 +28,24 @@ function content_slider_perm() {
   return array('access content_slider', 'administer content_slider');
 }
 
-function content_slider_menu($may_cache) {
+function content_slider_menu() {
   $items = array();
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/settings/content_slider',
-      'title' => 'Content Slider',
-      'description' => t('Setting Content Slider.'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('content_slider_admin_settings'),
-      'access' => user_access('administer content_slider'),
-      'type' => MENU_NORMAL_ITEM,
-    );
 
-    $items[] = array(
-      'path' => 'content_slider/list/'. arg(2),
-      'title' => t('Content Slider'),
-      'callback' => 'content_slider_page_list',
-      'callback arguments' => array(arg(2)),
-      'access' => user_access('access content_slider'),
-      'type' => MENU_CALLBACK,
-    );
-  }
+    $items['admin/settings/content_slider'] = array(
+    'title' => 'Content Slider',
+    'description' => t('Setting Content Slider.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_slider_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+  );
+   $items[] = array(
+   'path' => 'content_slider/list/'. arg(2),
+   'title' => t('Content Slider'),
+   'page callback' => 'content_slider_page_list',
+   'page arguments' => array(arg(2)),
+   'access arguments' => array('access content_slider'),
+   'type' => MENU_CALLBACK,
+   );
   return $items;
 }
 

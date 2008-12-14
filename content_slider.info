@@ -1,5 +1,5 @@
-; $Id$
 name = "Featured Content Slider Block"
-description = "Display content and image in Slide show mode using jQuery."
+description = "Display content and image in Slide show mode using jQuery for Drupal 6. Module by Ebizon Technologie. (http://www.ebizontek.com)"
 package = "Other"
-version = "5.x-1.0-dev"
+core = 6.x
+
