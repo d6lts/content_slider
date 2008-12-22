@@ -170,7 +170,7 @@ function content_slider_block($op = 'list', $delta = 0) {
     }
 
     $output_body = '';
-    $sql  = " SELECT n.nid, teaser FROM {node} n INNER JOIN {node_revisions} r ON n.nid=r.nid "." WHERE n.status=1 AND n.type='$content_type' LIMIT 5";
+    $sql  = " SELECT n.nid, teaser FROM {node} n INNER JOIN {node_revisions} r ON n.nid=r.nid "." WHERE n.status=1 AND n.type='$content_type' ORDER BY n.created  LIMIT 5";
     $results     = db_query($sql);
 
     $output_body .= '<div id="slider1" class="sliderwrapper">'."\n";
@@ -206,7 +206,7 @@ function content_slider_block($op = 'list', $delta = 0) {
     $output_body .= '</script>';
 
 
-    $output_body .= '</div>';
+    //$output_body .= '</div>';
 
 
     $block['subject'] = 'Content Slider 1';
