@@ -28,24 +28,28 @@ function content_slider_perm() {
   return array('access content_slider', 'administer content_slider');
 }
 
-function content_slider_menu() {
+function content_slider_menu($may_cache) {
   $items = array();
+  if ($may_cache) {
+    $items[] = array(
+      'path' => 'admin/settings/content_slider',
+      'title' => 'Content Slider',
+      'description' => t('Setting Content Slider.'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('content_slider_admin_settings'),
+      'access' => user_access('administer content_slider'),
+      'type' => MENU_NORMAL_ITEM,
+    );
 
-    $items['admin/settings/content_slider'] = array(
-    'title' => 'Content Slider',
-    'description' => t('Setting Content Slider.'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('content_slider_admin_settings'),
-    'access arguments' => array('administer site configuration'),
-  );
-   $items[] = array(
-   'path' => 'content_slider/list/'. arg(2),
-   'title' => t('Content Slider'),
-   'page callback' => 'content_slider_page_list',
-   'page arguments' => array(arg(2)),
-   'access arguments' => array('access content_slider'),
-   'type' => MENU_CALLBACK,
-   );
+    $items[] = array(
+      'path' => 'content_slider/list/'. arg(2),
+      'title' => t('Content Slider'),
+      'callback' => 'content_slider_page_list',
+      'callback arguments' => array(arg(2)),
+      'access' => user_access('access content_slider'),
+      'type' => MENU_CALLBACK,
+    );
+  }
   return $items;
 }
 
@@ -108,7 +112,7 @@ function content_slider_admin_settings() {
   $form['content_slider_source']['content_slider_source_3'] = array(
     '#type' => 'textfield',
     '#title' => t('Content type for Slider 3'),
-    '#default_value' => variable_get('content_slider_source_3', ''),
+    '#default_value' => variable_get('content_slider_source_3', 'featured'),
   );
 
   return system_settings_form($form);
@@ -124,8 +128,8 @@ function content_slider_block($op = 'list', $delta = 0) {
   $content_slider_direction = variable_get("content_slider_direction", 'leftright');
 
   $content_slider_source_1 = variable_get("content_slider_source_1", "page");
-  $content_slider_source_2 = variable_get("content_slider_source_2", "");
-  $content_slider_source_3 = variable_get("content_slider_source_3", "");
+  $content_slider_source_2 = variable_get("content_slider_source_2", "story");
+  $content_slider_source_3 = variable_get("content_slider_source_3", "featured");
 
   global $base_url;
   $ajax_base_path = $base_url;
@@ -155,42 +159,55 @@ function content_slider_block($op = 'list', $delta = 0) {
     //drupal_add_js($output_head,'inline');
 
     $slider_id = $delta + 1;
-    switch ($delta) {
+     switch ($delta) {
       case 0:
         $content_type = $content_slider_source_1;
+        $block['subject'] = 'Content Slider 1';
+        $block['content'] = outbody_of_block($content_type,$delta);
         break;
 
       case 1:
         $content_type = $content_slider_source_2;
+        $block['subject'] = 'Content Slider 2';
+        $block['content'] = outbody_of_block($content_type,$delta);
+
         break;
 
       case 2:
         $content_type = $content_slider_source_3;
+        $block['subject'] = 'Content Slider 3';
+        $block['content'] = outbody_of_block($content_type,$delta);
+
         break;
     }
+    return $block;
 
-    $output_body = '';
-    $sql  = " SELECT n.nid, teaser FROM {node} n INNER JOIN {node_revisions} r ON n.nid=r.nid "." WHERE n.status=1 AND n.type='$content_type' ORDER BY n.created  LIMIT 5";
+    }
+}
+function outbody_of_block($content_type,$delta)
+{
+ $output_body = '';
+    $sql  = " SELECT n.nid, teaser FROM {node} n INNER JOIN {node_revisions} r ON n.nid=r.nid "." WHERE n.status=1 AND n.type='".$content_type."' ORDER BY n.changed DESC LIMIT 5";
     $results     = db_query($sql);
 
-    $output_body .= '<div id="slider1" class="sliderwrapper">'."\n";
+    $output_body .= '<div id="slider'.$delta.'" class="sliderwrapper">'."\n";
     while ($data = db_fetch_object($results)) {
       $slider_nid = $data->nid;
       $output_body .= '<div class="contentdiv">'."\n";
-      $output_body .= "<a href='$base_url/node/$slider_nid'>". node_view(node_load($data->nid), 1) ."</a>";
+      $output_body .= "<a href='".$base_url."/node/".$slider_nid."'>". node_view(node_load($data->nid), 1) ."</a>";
       if ($slider_nid == 1) {
         $output_body .= '<p></p><a href="javascript:featuredcontentslider.jumpTo(\'slider1\', 3)">';
       }
       $output_body .= '</div>';
     }
     $output_body .= '</div>';
-    $output_body .= '<div id="paginate-slider1" class="pagination">'."\n";
+    $output_body .= '<div id="paginate-slider'.$delta.'" class="pagination">'."\n";
     $output_body .= '</div>';
 
     $output_body .= '<script type="text/javascript">';
 
     $output_body .= 'featuredcontentslider.init({'."\n";
-    $output_body .= 'id: "slider1",//id of main slider DIV'."\n";
+    $output_body .= 'id: "slider'.$delta.'",//id of main slider DIV'."\n";
     $output_body .= 'contentsource: ["inline", ""],  //Valid values: ["inline", ""] or ["ajax", "path_to_file"]'."\n";
     $output_body .= 'toc: "#increment",  //Valid values: "#increment", "markup", ["label1", "label2", etc]'."\n";
     $output_body .= 'nextprev: ["Previous", "Next"],  //labels for "prev" and "next" links. Set to "" to hide.'."\n";
@@ -204,23 +221,15 @@ function content_slider_block($op = 'list', $delta = 0) {
     $output_body .= '})';
 
     $output_body .= '</script>';
-
+     return  $output_body;
 
     //$output_body .= '</div>';
-
-
-    $block['subject'] = 'Content Slider 1';
-    $block['content'] = $output_body;
-
-
-    return $block;
-  }
 }
 
 function content_slider_page_list($i) {
   $content_slider_item = variable_get("content_slider_item", 10);
 
-  $dse_news_total = db_query(" SELECT count(*) AS total FROM {node} n WHERE n.type='slider$i' AND n.status=1");
+  $dse_news_total = db_query(" SELECT count(*) AS total FROM {node} n WHERE n.type='slider".$i."' AND n.status=1");
   $row_news       = db_fetch_object($dse_news_total);
   $news_total     = $row_news->total;
   $sql_counts     = "SELECT $news_total";
