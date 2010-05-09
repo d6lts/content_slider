@@ -7,7 +7,7 @@ This contrib module has dependencies on image, imagecache, emfield, emvideo. It 
 
 Installation of the module automatically creates the block which can be put anywhere you want. The content type "Featured content slider" would allow for the user to enter the content.
 
-Other settings can be configured from: admin/settings/eb_content_slider.
+Other settings can be configured from: admin/settings/eb_custom_slider.
 
 The view can be further themed by changing node-eb_custom_slider.tpl.php in the module.
 
