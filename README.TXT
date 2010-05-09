@@ -31,5 +31,5 @@ Special Thanks:
 
 jchatard (http://drupal.org/user/130002): for a patch that fixes lot of bugs with this module. Also, makes it more compatible with Drupal standards.
 bordage (http://drupal.org/user/165112): for releasing franch translation of this module.
-
+manarth (http://drupal.org/user/321496): for other patches.
 
