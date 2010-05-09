@@ -1,0 +1,12 @@
+name = "Featured Content Slider Custom"
+description = "Display content and image in Slide show mode. This contribution automatically created the necessary content type called featured content slider, comes with inbuilt theming (resize images, thumnails), allows for videos in the slider. Module by Ebizon Technologie. (http://www.ebizontek.com)"
+
+dependencies[] = imagecache
+dependencies[] = image
+dependencies[] = imageapi
+dependencies[] = emfield
+dependencies[] = emvideo
+
+package = "other"
+core = 6.x
+
