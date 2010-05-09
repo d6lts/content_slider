@@ -331,7 +331,7 @@ function eb_custom_slider_init(){
 function eb_custom_slider_menu() {
   $items = array ();
 
-  $items['admin/settings/content_slider'] = array (
+  $items['admin/settings/eb_custom_slider'] = array (
       'title' => 'eb_content_slider',
       'description' => t('setting eb_content_slider.'), 
        'page callback' => 'drupal_get_form', 
