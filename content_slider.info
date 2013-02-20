@@ -1,0 +1,9 @@
+name = Featured Content Slider
+description = Display content and image in Slide show mode using jQuery for Drupal 7. Module by Ebizon Technologie. (http://www.ebizontek.com)
+package = Other
+version = 7.x-1.0
+core = 7.x
+files[] = content_slider.module
+stylesheets[all][] = css/content_slider.css
+configure = admin/settings/content_slider 
+
