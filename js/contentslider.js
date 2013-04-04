@@ -76,9 +76,9 @@ buildpaginate:function(setting){
 	var nextprev=setting.nextprev
 	if (typeof toc=="string" && toc!="markup" || typeof toc=="object"){
 		for (var i=1; i<=setting.contentdivs.length; i++){
-			phtml+='<a href="#'+i+'" class="toc">'+(typeof toc=="string"? toc.replace(/#increment/, i) : toc[i-1])+'</a> '
+			phtml+='<a href="#'+i+'" class="toc">'+(typeof toc=="string"? toc.replace(/#increment/, i) : toc[i-1])+'</a>'
 		}
-		phtml=(nextprev[0]!=''? '<a href="#prev" class="prev">'+nextprev[0]+'</a> ' : '') + phtml + (nextprev[1]!=''? '<a href="#next" class="next">'+nextprev[1]+'</a>' : '')
+		phtml=(nextprev[0]!=''? '<a href="#prev" class="prev">'+nextprev[0]+'</a>' : '') + phtml + (nextprev[1]!=''? '<a href="#next" class="next">'+nextprev[1]+'</a>' : '')
 		pdiv.innerHTML=phtml
 	}
 	var pdivlinks=pdiv.getElementsByTagName("a")
@@ -217,7 +217,7 @@ setCookie:function(name, value){
 
 init:function(setting){
 	var persistedpage=this.getCookie("fcspersist"+setting.id) || 1
-	var urlselectedpage= 1 //this.urlparamselect(setting.id) //returns null or index from: mypage.htm?featuredcontentsliderid=index
+	var urlselectedpage=this.urlparamselect(setting.id) //returns null or index from: mypage.htm?featuredcontentsliderid=index
 	this.settingcaches[setting.id]=setting //cache "setting" object
 	setting.contentdivs=[]
 	setting.toclinks=[]
