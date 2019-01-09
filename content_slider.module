@@ -165,7 +165,7 @@ function content_slider_block($op = 'list', $delta = 0) {
   }
 }
 
-function content_slider_load_nodes($content_type, $delta) {
+function content_slider_load_nodes($content_type) {
   $nodes = array();
   // I'm wondering why ORDER BY n.changed? wouldn't be n.created more accurate?
   $result = db_query_range("SELECT n.nid FROM {node} n WHERE n.status = 1 AND n.type = '%s' ORDER BY n.changed DESC", array($content_type), $from = 0, $count = 5);
