@@ -3,9 +3,3 @@ description = "Display content and image in Slide show mode using jQuery for Dru
 package = "Other"
 core = 6.x
 
-
-; Information added by Drupal 6 LTS vendors on 2019-01-09
-version = "6.x-2.2"
-core = "6.x"
-project = "content_slider"
-datestamp = "1547066516"
